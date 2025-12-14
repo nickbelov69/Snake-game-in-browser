@@ -5,13 +5,14 @@ function App() {
     const cells = Array.from({ length: 100 }, (_, i) => i);
 
     // 1) поправим баг с таймаутом
-    // 2) нажимаем кнопку - начинается игра (после гейм овер)
     // 3) чтобы змейка могла выходить с другой стороны экрана
 
 
     const [snake, setSnake] = useState([55]);
     const [direction, setDirection] = useState(null);
     const [food, setFood] = useState(5);
+
+    const directionRef = useRef(direction);
 
     const intervalRef = useRef(null);
     const gameOverRef = useRef(false); // флаг для одного Game Over
@@ -25,6 +26,9 @@ function App() {
 
     // Обработка клавиш
     useEffect(() => {
+        console.log('direction changed!', direction);
+        directionRef.current = direction;
+
         const handleKeyDown = (e) => {
             if (e.key === "ArrowUp" && direction !== "down") setDirection("up");
             if (e.key === "ArrowDown" && direction !== "up") setDirection("down");
@@ -61,14 +65,31 @@ function App() {
                     return [newHead, ...prev.slice(0, -1)];
                 }
             });
-        }, 100);
+        }, 2000);
 
         return () => clearInterval(intervalRef.current);
     }, [direction, food]);
 
+    // конец игры
+    const onGameOver = (crashDirection) => {
+        const currentDirection = directionRef.current;
+
+        if (crashDirection !== currentDirection) {
+            return;
+        }
+        alert("Game Over!");
+        console.log('game over', crashDirection)
+        // авто-ресет
+        setSnake([55]);
+        setDirection(null);
+        setFood(randomEmptyCell([55]));
+        gameOverRef.current = false;
+    };
+
     // Проверка столкновений
     useEffect(() => {
         const head = snake[0];
+        console.log('direction use effect', direction)
         if (
             head < 0 ||
             head >= 100 ||
@@ -80,13 +101,8 @@ function App() {
                 gameOverRef.current = true;
                 clearInterval(intervalRef.current);
                 setTimeout(() => {
-                    alert("Game Over!");
-                    // авто-ресет
-                    setSnake([55]);
-                    setDirection(null);
-                    setFood(randomEmptyCell([55]));
-                    gameOverRef.current = false;
-                }, 0);
+                    onGameOver(direction)
+                }, 2000);
             }
         }
     }, [snake, direction]);
