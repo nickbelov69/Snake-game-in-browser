@@ -10,7 +10,7 @@ function App() {
 
 
     const [snake, setSnake] = useState([55]);
-    const [direction, setDirection] = useState("right");
+    const [direction, setDirection] = useState(null);
     const [food, setFood] = useState(5);
 
     const intervalRef = useRef(null);
@@ -41,6 +41,10 @@ function App() {
 
         intervalRef.current = setInterval(() => {
             setSnake((prev) => {
+                if (!direction) {
+                    return prev;
+                }
+
                 const head = prev[0];
                 let newHead = head;
 
@@ -79,7 +83,7 @@ function App() {
                     alert("Game Over!");
                     // авто-ресет
                     setSnake([55]);
-                    setDirection("right");
+                    setDirection(null);
                     setFood(randomEmptyCell([55]));
                     gameOverRef.current = false;
                 }, 0);
