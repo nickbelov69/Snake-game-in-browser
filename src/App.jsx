@@ -4,6 +4,11 @@ import "./App.css";
 function App() {
     const cells = Array.from({ length: 100 }, (_, i) => i);
 
+    // 1) поправим баг с таймаутом
+    // 2) нажимаем кнопку - начинается игра (после гейм овер)
+    // 3) чтобы змейка могла выходить с другой стороны экрана
+
+
     const [snake, setSnake] = useState([55]);
     const [direction, setDirection] = useState("right");
     const [food, setFood] = useState(5);
